@@ -12,8 +12,7 @@ SEVERITY = "ERROR"
 def _has_fk_to(entity: Entity, other_name: str) -> bool:
     """True if some FK of `entity` references a PK of `other_name`."""
     return any(
-        referenced_entity(fk.references) == other_name
-        for fk in entity.foreign_keys
+        referenced_entity(fk.references) == other_name for fk in entity.foreign_keys
     )
 
 
@@ -47,7 +46,7 @@ def check(model: DiagramModel) -> list[Violation]:
                 SEVERITY,
                 describe(relationship),
                 f"Relationship between {left.name} and {right.name} "
-                f"has no foreign key referencing across it",
+                + "has no foreign key referencing across it",
             )
         )
 
@@ -61,7 +60,7 @@ def check(model: DiagramModel) -> list[Violation]:
                         SEVERITY,
                         target,
                         f"Foreign key {target} does not reference a primary key "
-                        f"of any related entity",
+                        + "of any related entity",
                     )
                 )
 

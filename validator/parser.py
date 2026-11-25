@@ -1,4 +1,4 @@
-"""
+r"""
 Parser for the supported PlantUML ER diagram subset.
 
 Reads PlantUML text (from a string or a .puml file) and builds a DiagramModel

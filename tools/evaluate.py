@@ -1,3 +1,1 @@
 """Run the lenient and strict presets on all the test data and report which tests passed and which failed."""
-
-pass

@@ -64,7 +64,7 @@ def write_file(model: DiagramModel, path: str | Path) -> None:
     Raises:
         OSError: If the file cannot be written.
     """
-    Path(path).write_text(write_puml(model), encoding="utf-8")
+    _ = Path(path).write_text(write_puml(model), encoding="utf-8")
 
 
 def write_puml(model: DiagramModel) -> str:

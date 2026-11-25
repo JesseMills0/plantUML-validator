@@ -35,9 +35,9 @@ def check(model: DiagramModel) -> list[Violation]:
                     RULE_ID,
                     SEVERITY,
                     target,
-                    f'{target} is a foreign key to {child_name}, but {parent_name} '
-                    f'is the "one" side of the relationship; '
-                    f"the FK belongs in {child_name}",
+                    f"{target} is a foreign key to {child_name}, but {parent_name} "
+                    + 'is the "one" side of the relationship; '
+                    + f"the FK belongs in {child_name}",
                 )
             )
     return violations

@@ -33,7 +33,7 @@ def check(model: DiagramModel) -> list[Violation]:
                         SEVERITY,
                         name,
                         f"{name} has type {fk.type} but references "
-                        f"{fk.references} which has type {pk.type}",
+                        + f"{fk.references} which has type {pk.type}",
                     )
                 )
     return violations

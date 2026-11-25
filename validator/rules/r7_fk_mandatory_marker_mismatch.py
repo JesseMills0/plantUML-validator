@@ -53,7 +53,7 @@ def check(model: DiagramModel) -> list[Violation]:
                     SEVERITY,
                     target,
                     f"{target} is {actual} but its relationship with "
-                    f"{parent_name} requires it to be {expected}",
+                    + f"{parent_name} requires it to be {expected}",
                 )
             )
     return violations

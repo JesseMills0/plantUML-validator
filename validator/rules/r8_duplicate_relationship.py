@@ -10,15 +10,14 @@ SEVERITY = "WARN"
 
 
 def _key(relationship: Relationship) -> tuple[tuple[str, str], tuple[str, str]]:
-    """Direction-independent key: each entity paired with its end's cardinality."""
-    return tuple(  # type: ignore[return-value]
-        sorted(
-            (
-                (relationship.left, relationship.left_card.value),
-                (relationship.right, relationship.right_card.value),
-            )
-        )
+    """Return a direction-independent pair of `(entity, cardinality)` items."""
+    a, b = sorted(
+        (
+            (relationship.left, relationship.left_card.value),
+            (relationship.right, relationship.right_card.value),
+        ),
     )
+    return (a, b)
 
 
 def check(model: DiagramModel) -> list[Violation]:
@@ -29,7 +28,7 @@ def check(model: DiagramModel) -> list[Violation]:
     for relationship in model.relationships:
         key = _key(relationship)
         counts[key] = counts.get(key, 0) + 1
-        first.setdefault(key, relationship)
+        _ = first.setdefault(key, relationship)
 
     return [
         Violation(
@@ -37,7 +36,7 @@ def check(model: DiagramModel) -> list[Violation]:
             SEVERITY,
             describe(first[key]),
             f"Relationship between {first[key].left} and {first[key].right} "
-            f"is defined {count} times with the same cardinalities",
+            + f"is defined {count} times with the same cardinalities",
         )
         for key, count in counts.items()
         if count > 1

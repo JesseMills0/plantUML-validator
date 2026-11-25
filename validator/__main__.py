@@ -1,4 +1,1 @@
 """Run the validator command line entry point."""
-
-
-pass

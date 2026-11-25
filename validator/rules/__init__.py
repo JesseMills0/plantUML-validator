@@ -38,4 +38,6 @@ def get_rule(rule_id: str) -> Rule:
         return RULES[rule_id]
     except KeyError:
         known = ", ".join(RULES)
-        raise KeyError(f"unknown rule {rule_id!r} (implemented rules: {known})") from None
+        raise KeyError(
+            f"unknown rule {rule_id!r} (implemented rules: {known})"
+        ) from None

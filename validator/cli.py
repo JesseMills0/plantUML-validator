@@ -1,4 +1,1 @@
 """Command line entry point for validating PlantUML ER diagrams."""
-
-
-pass

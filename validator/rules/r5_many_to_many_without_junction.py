@@ -17,7 +17,7 @@ def check(model: DiagramModel) -> list[Violation]:
             SEVERITY,
             describe(relationship),
             f"Relationship between {relationship.left} and {relationship.right} "
-            f"is many-to-many; model it with a junction entity",
+            + "is many-to-many; model it with a junction entity",
         )
         for relationship in model.relationships
         if relationship.is_many_to_many
