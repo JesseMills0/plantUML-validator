@@ -1,0 +1,6 @@
+# Strict preset: lenient rules plus the stricter rules.
+name: strict
+description: Core rules plus many-to-many and mandatory-cycle checks.
+enabled: [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11]
+# Might leave out rules 7 through 11 if we don't get them implemented, 
+# or make them optional inclusions.

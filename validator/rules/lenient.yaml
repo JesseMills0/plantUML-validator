@@ -1,0 +1,4 @@
+# Lenient preset: core structural rules only.
+name: lenient
+description: Core key and relationship consistency rules.
+enabled: [R1, R2, R3, R4]

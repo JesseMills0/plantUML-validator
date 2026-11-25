@@ -1,0 +1,79 @@
+# Catalog of every rule. Presets (lenient.yaml, strict.yaml) choose which ones run.
+# `mutation` is used by tools/inject_errors.py only; the validator can ignore it.
+rules:
+  - id: R1
+    name: missing-primary-key
+    description: Entity has no attribute marked <<PK>>.
+    severity: ERROR
+    optional: false
+    mutation: Strip <<PK>> from an entity that is not the parent in any relationship.
+
+  - id: R2
+    name: fk-on-wrong-side
+    description: In a one-to-many relationship, the parent (one side) holds an FK that references a PK of the child (many side).
+    severity: ERROR
+    optional: false
+    mutation: Swap the two cardinality ends of a relationship (||--o{ becomes }o--||).
+
+  - id: R3
+    name: fk-relationship-mismatch
+    description: A relationship (not many-to-many) with no FK referencing across it, or an FK whose references is None. Direction is ignored.
+    severity: ERROR
+    optional: false
+    mutation: Delete the non-PK FK of a relationship, or delete a relationship whose two entities both keep another relationship.
+
+  - id: R4
+    name: fk-type-mismatch
+    description: FK type differs from the type of the PK it references (case and spaces ignored). FKs with no references are skipped.
+    severity: ERROR
+    optional: false
+    mutation: Change one FK's type to a different type.
+
+  - id: R5
+    name: many-to-many-without-junction
+    description: A relationship where both ends are many.
+    severity: ERROR
+    optional: false
+    mutation: Replace a junction entity and its two relationships with a direct A }o--o{ B.
+
+  - id: R6
+    name: mandatory-cycle
+    description: A requires B when the marker at B's end is mandatory (||, }|, |{). Flag each cycle of requirements, including a self-relationship with a mandatory end.
+    severity: ERROR
+    optional: false
+    mutation: Change o{ to |{ on a relationship whose one end is ||.
+
+  - id: R7
+    name: fk-mandatory-marker-mismatch
+    description: For an FK in the child of a one-to-many relationship, the FK needs * if the parent end is ||, and must not have * if the parent end is |o.
+    severity: ERROR
+    optional: true
+    mutation: Toggle * on a non-PK FK.
+
+  - id: R8
+    name: duplicate-relationship
+    description: Two relationships between the same two entities with identical cardinalities (either direction).
+    severity: WARN
+    optional: true
+    mutation: Copy a relationship line.
+
+  - id: R9
+    name: orphan-entity
+    description: Entity that appears in no relationship (only checked when the diagram has 2 or more entities).
+    severity: WARN
+    optional: true
+    mutation: Add a new entity with only a * PK and no relationships.
+
+  - id: R10
+    name: pk-not-mandatory
+    description: PK attribute without the * mandatory marker.
+    severity: ERROR
+    optional: true
+    mutation: Remove * from a PK that is not also an FK.
+
+  - id: R11
+    name: duplicate-attribute-name
+    description: Two attributes with the same name in one entity.
+    severity: ERROR
+    optional: true
+    mutation: Copy a plain (non-key) attribute inside its entity.
