@@ -1,1 +1,3 @@
-# Evaluation output.
+# if we make any kind of metrics in evaluate.py, place them here. if not, don't worry about it
+# Honestly the report should probably go in the stdout, so we probably won't use this.
+# If we wanna save that data we can place it in a file i guess
