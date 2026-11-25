@@ -11,7 +11,7 @@ The tool is evaluated on valid diagrams and on diagrams with one deliberately in
 
 How it works:
 
-```
+```txt
 diagram.puml --> parser --> DiagramModel --> enabled rules --> violations --> printed + PASS/FAIL
                                                ^
                                       preset (configs/*.yaml)
@@ -21,22 +21,23 @@ diagram.puml --> parser --> DiagramModel --> enabled rules --> violations --> pr
 
 Update this checklist as pieces land. Put your name next to anything you claim.
 
-**To do (checked = done)**
-- [x] `validator/model.py`: shared data classes (do not change without team agreement)
-- [x] `validator/parser.py`: PlantUML text to model
-- [x] `validator/writer.py`: model to PlantUML text (round-trips with the parser)
-- [x] Rule definitions and strict/lenient configurations
-- [ ] YAML config loader: read a preset, check every enabled ID exists in `rules.yaml` and in the registry, return the list of IDs (owner: ___)
-- [ ] Rules R1 to R6, one file each in `validator/rules/`, plus the registry (owner: ___)
-- [ ] `validator/validate.py`: run the enabled rules on a model and return the violations (owner: ___)
-- [ ] `validator/cli.py` and `__main__.py`: command-line entry point (owner: ___)
-- [ ] Tests: parser tests and one test file per rule in `tests/` (owner: ___)
-- [ ] `tools/generate_diagrams.py`: generate valid diagrams (owner: ___)
-- [ ] `tools/inject_errors.py`: mutate valid diagrams and write ground truth (owner: ___)
-- [ ] `tools/evaluate.py`: run both presets on all data and report which tests passed and failed (owner: ___)
-- [ ] A few handwritten diagrams in `data/samples/` (owner: ___)
-- [ ] Optional rules R7 to R11, only if time allows (owner: ___)
-- [ ] Finish this README: fill in the real CLI flags, remove unused dependencies from `requirements.txt` (owner: ___)
+## To do (checked = done)
+
+- [x] `validator/model.py`: shared data classes (do not change without team agreement) (owner: Jesse)
+- [x] `validator/parser.py`: PlantUML text to model (owner: Jesse)
+- [x] `validator/writer.py`: model to PlantUML text (round-trips with the parser) (owner: Jesse)
+- [x] Rule definitions and strict/lenient configurations (owner: Jesse)
+- [ ] YAML config loader: read a preset, check every enabled ID exists in `rules.yaml` and in the registry, return the list of IDs (owner: Tyler)
+- [x] Rules R1 to R6, one file each in `validator/rules/`, plus the registry (owner: Jesse)
+- [ ] `validator/validate.py`: run the enabled rules on a model and return the violations (only validate R7-R11 if time allows) (owner: Tyler)
+- [ ] `validator/cli.py` and `__main__.py`: command-line entry point (owner: Maxime)
+- [ ] Tests: parser tests and one test file per rule in `tests/` (owner: Jacob)
+- [ ] `tools/generate_diagrams.py`: generate valid diagrams (owner: Jacob)
+- [ ] `tools/inject_errors.py`: mutate valid diagrams and write ground truth (owner: Jacob)
+- [ ] `tools/evaluate.py`: run both presets on all data and report which tests passed and failed (owner: Jacob)
+- [ ] A few handwritten diagrams in `data/samples/` (owner: Jacob)
+- [x] Optional rules R7 to R11, only if time allows (owner: Jesse)
+- [ ] Finish this README: fill in the real CLI flags, remove unused dependencies from `requirements.txt` (owner: All)
 
 Suggested order: rules and tests only need `model.py` and `parser.py`, so they can start now. The generator and mutator need `writer.py` (done). `evaluate.py` needs everything else.
 
@@ -51,7 +52,7 @@ Input is one PlantUML ER diagram per file, using a defined subset of syntax. Any
 - Relationships: `Left <left><right> Right [: label]` using crow's-foot symbols, joined by `--` (or `..`)
 
 | Cardinality | Left end | Right end |
-|---|---|---|
+| --- | --- | --- |
 | Exactly one | `\|\|` | `\|\|` |
 | Zero or one | `\|o` | `o\|` |
 | One or more | `}\|` | `\|{` |
@@ -75,6 +76,7 @@ Customer ||--o{ Order : places
 ```
 
 Things to know about the parser:
+
 - PlantUML does not say which PK an FK points to, so the parser fills in `Attribute.references` (as `"Entity.pk_name"`) by matching an FK's name to a PK name on a connected entity. Self-relationships are skipped. An FK with no match keeps `references = None`.
 - Duplicate entity names raise a `ParseError`. Duplicate attribute names inside an entity are not rejected (rule R11 covers them).
 - `..` lines are read as `--`; the model does not store the line style.
@@ -83,7 +85,7 @@ Things to know about the parser:
 
 Requires Python 3.12 or newer (the model uses `typing.override`).
 
-```
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -93,13 +95,13 @@ pip install -r requirements.txt
 
 Intended behavior (final flag names are decided when `cli.py` is written):
 
-```
+```bash
 python -m validator path/to/diagram.puml --preset strict
 ```
 
 Output is one line per violation, then a verdict:
 
-```
+```txt
 [ERROR] R1  Entity "Order" has no primary key
 [ERROR] R4  Order.customer_id is varchar(20) but references Customer.customer_id (int)
 FAIL (2 violations)
@@ -116,7 +118,7 @@ FAIL (2 violations)
 A **relationship is one-to-many** if exactly one end is many. The many-end entity is the **child** (holds the FK); the other is the **parent**. An FK's target PK is `fk.references`.
 
 | ID | Rule | Preset |
-|---|---|---|
+| --- | --- | --- |
 | R1 | **Missing primary key.** Entity has no `<<PK>>` attribute. | lenient + strict |
 | R2 | **FK on the wrong side.** In a one-to-many relationship, the parent holds an FK that references a PK of the child. | lenient + strict |
 | R3 | **FK/relationship mismatch.** (a) A relationship (not many-to-many) where neither entity has an FK referencing the other, or (b) an FK whose `references` is `None`. Direction is ignored; R2 owns that. | lenient + strict |
@@ -133,7 +135,7 @@ The same information lives in `configs/rules.yaml`, which is the source for seve
 
 ### Adding a rule
 
-- One file per rule in `validator/rules/`, for example `r1_missing_pk.py`.
+- One file per rule in `validator/rules/`, for example `r1_missing_primary_key.py`.
 - A rule is a function that takes a `DiagramModel` and returns a `list[Violation]` (`rule_id`, `severity`, `target`, `message`).
 - Register it in the registry (a dict from rule ID to function) so `validate.py` can look it up.
 - Enable it by adding its ID to `enabled` in a preset file.
@@ -152,7 +154,8 @@ All three scripts live in `tools/`. Exact arguments are decided when they are wr
 2. `inject_errors.py` takes valid diagrams, injects one error each, and writes the mutated diagrams plus ground truth (which rule each mutation should trigger) to `data/mutated/`.
 3. `evaluate.py` runs both presets on all the data and reports which tests passed and which failed.
 
-**Proposed pass criteria**
+## Proposed pass criteria
+
 - A valid diagram passes if both presets report zero violations.
 - A mutated diagram passes under a preset that enables the intended rule if exactly that rule fires, and nothing else.
 - A mutated diagram passes under a preset that does not enable the intended rule if it reports no violations. This is the expected lenient-vs-strict difference: lenient does not catch R5 and above.
@@ -172,7 +175,7 @@ These keep valid diagrams free of violations and keep each mutation to a single 
 ### Mutations (for the mutator)
 
 | Rule | Mutation |
-|---|---|
+| --- | --- |
 | R1 | Strip `<<PK>>` from an entity that is not the parent in any relationship |
 | R2 | Swap the two cardinality ends of a relationship (`\|\|--o{` becomes `}o--\|\|`) |
 | R3 | Delete the non-PK FK of a relationship, or delete a relationship whose two entities both keep another relationship |
@@ -190,7 +193,7 @@ Safety net: after mutating, run all rules and keep the diagram only if exactly t
 ## Project layout
 
 | Path | Purpose |
-|---|---|
+| --- | --- |
 | `validator/` | The tool: `model.py`, `parser.py`, `writer.py`, `validate.py`, `cli.py`, `__main__.py` |
 | `validator/rules/` | One rule per file, plus the registry |
 | `configs/` | Rule catalog and the lenient and strict presets (YAML) |
